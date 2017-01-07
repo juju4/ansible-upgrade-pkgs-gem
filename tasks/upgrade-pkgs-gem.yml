@@ -1,0 +1,57 @@
+---
+
+- include: gcc.yml
+
+## possible dependencies: libsqlite3-dev
+- name: check which gem
+  command: which gem
+  changed_when: false
+  ignore_errors: true
+  register: gem1
+  tags: gem
+- name: Linux | ensure ruby-dev is installed
+  package: name=ruby-dev state=present
+  when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and ansible_system == "Linux"
+  tags: gem
+- name: get installed gem
+#  shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
+  shell: "gem outdated --local | awk '{ print $1 }'"
+  register: gemlist
+  changed_when: false
+  ignore_errors: true
+  when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1
+  tags: gem
+- debug: var=gemlist
+
+- block:
+    - name: update system gem
+      gem: name={{ item }} state=latest user_install=no
+      with_items: "{{ gemlist.stdout_lines }}"
+    - name: set gem_updated var
+      set_fact:
+        gem_updated: true
+  when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and gemlist.stdout is defined and gemlist.stdout != '' and gemlist.stdout_lines is defined and gemlist.stdout_lines != []
+  tags: gem
+- block:
+    - name: get outdated user gem
+#          shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
+      shell: "gem outdated --local | awk '{ print $1 }'"
+      register: gemlistuser
+      changed_when: false
+      ignore_errors: true
+      become: yes
+      become_user: "{{ upgradepkgsgem_gem_user[inventory_hostname] }}"
+    - name: update user gem
+      gem: name={{ item }} state=latest
+      become: yes
+      become_user: "{{ upgradepkgsgem_gem_user[inventory_hostname] }}"
+      with_items: "{{ gemlistuser.stdout_lines }}"
+    - name: set gem_updated var
+      set_fact:
+        gem_updated: true
+  when: gem_user is defined and upgradepkgsgem_gem_user[inventory_hostname] is defined and upgradepkgsgem_gem_user[inventory_hostname] != ''
+  tags: gem
+  
+## gem cleanup <pkg>
+## gem uninstall -i /usr/share/rubygems-integration/all thor
+

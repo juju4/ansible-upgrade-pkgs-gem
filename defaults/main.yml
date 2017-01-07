@@ -1,0 +1,8 @@
+---
+
+upgradepkgsgem_exclude_hosts:
+  host1: true
+  host2: true
+upgradepkgsgem_gem_user:
+#  host: localuser
+
