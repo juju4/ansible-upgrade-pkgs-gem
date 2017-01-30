@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/juju4/ansible-upgrade-pkgs-gem.svg?branch=master)](https://travis-ci.org/juju4/ansible-upgrade-pkgs-gem)
+[![Build Status - Master](https://travis-ci.org/juju4/ansible-upgrade-pkgs-gem.svg?branch=master)](https://travis-ci.org/juju4/ansible-upgrade-pkgs-gem)
+[![Build Status - Devel](https://travis-ci.org/juju4/ansible-upgrade-pkgs-gem.svg?branch=devel)](https://travis-ci.org/juju4/ansible-upgrade-pkgs-gem/branches)
 # upgrade-pkgs-gem ansible role
 
 Ansible role to upgrade gem packages
