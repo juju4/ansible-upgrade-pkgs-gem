@@ -15,7 +15,7 @@
   tags: gem
 - name: get installed gem
 #  shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
-  shell: "gem outdated --local | awk '{ print $1 }'"
+  shell: "gem outdated --local | awk '!/{{ upgradepkgsgem_gem_exclude }}/ { print $1 }'"
   register: gemlist
   changed_when: false
   ignore_errors: true
@@ -32,10 +32,13 @@
         gem_updated: true
   when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and gemlist.stdout is defined and gemlist.stdout != '' and gemlist.stdout_lines is defined and gemlist.stdout_lines != []
   tags: gem
+
+- debug: var=gem_user
+- debug: var=upgradepkgsgem_gem_user
 - block:
     - name: get outdated user gem
 #          shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
-      shell: "gem outdated --local | awk '{ print $1 }'"
+      shell: "gem outdated --local | awk '!/{{ upgradepkgsgem_gem_exclude }}/ { print $1 }'"
       register: gemlistuser
       changed_when: false
       ignore_errors: true

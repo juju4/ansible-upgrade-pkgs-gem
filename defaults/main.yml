@@ -6,3 +6,5 @@ upgradepkgsgem_exclude_hosts:
 upgradepkgsgem_gem_user:
 #  host: localuser
 
+## awk regex
+upgradepkgsgem_gem_exclude: '(did_you_mean)'
