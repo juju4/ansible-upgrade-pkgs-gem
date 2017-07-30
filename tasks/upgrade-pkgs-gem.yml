@@ -1,6 +1,7 @@
 ---
 
 - include: gcc.yml
+  when: ansible_system == 'Linux'
 
 ## possible dependencies: libsqlite3-dev
 - name: check which gem
