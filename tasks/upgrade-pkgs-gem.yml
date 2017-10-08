@@ -55,7 +55,7 @@
         gem_updated: true
   when: gem_user is defined and upgradepkgsgem_gem_user[inventory_hostname] is defined and upgradepkgsgem_gem_user[inventory_hostname] != ''
   tags: gem
-  
+
 ## gem cleanup <pkg>
 ## gem uninstall -i /usr/share/rubygems-integration/all thor
 
