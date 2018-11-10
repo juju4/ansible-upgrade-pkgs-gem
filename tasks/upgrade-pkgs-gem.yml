@@ -3,6 +3,14 @@
 - include: gcc.yml
   when: ansible_system == 'Linux'
 
+- name: Ensure gem without documentation - can fill inodes
+  lineinfile:
+    dest: /root/.gemrc
+    line: "{{ item }}"
+  with_items:
+    - 'install: --no-rdoc --no-ri'
+    - 'update: --no-rdoc --no-ri'
+
 ## possible dependencies: libsqlite3-dev
 - name: check which gem
   command: which gem
