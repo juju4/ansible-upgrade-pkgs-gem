@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: upgrade_pkgs_gem
   author: juju4
   description: upgrade gem packages
   license: BSD
