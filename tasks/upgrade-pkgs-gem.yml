@@ -4,7 +4,7 @@
   when: ansible_system == 'Linux'
 
 - name: Ensure gem without documentation - can fill inodes
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /root/.gemrc
     line: "{{ item }}"
     create: yes
@@ -14,35 +14,35 @@
 
 ## possible dependencies: libsqlite3-dev
 - name: check which gem
-  command: which gem
+  ansible.builtin.command: which gem
   changed_when: false
   ignore_errors: true
   register: gem1
   tags: gem
 - name: Linux | ensure ruby-dev is installed
-  package: name=ruby-dev state=present
+  ansible.builtin.package: name=ruby-dev state=present
   when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and ansible_system == "Linux"
   tags: gem
   register: pkg_result
   until: pkg_result is success
 - name: get installed gem
-#  shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
-  shell: "gem outdated --local | awk '!/{{ upgradepkgsgem_gem_exclude }}/ { print $1 }'"
+#  ansible.builtin.shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
+  ansible.builtin.shell: "gem outdated --local | awk '!/{{ upgradepkgsgem_gem_exclude }}/ { print $1 }'"
   register: gemlist
   changed_when: false
   ignore_errors: true
   when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1
   tags: gem
-- debug: var=gemlist
+- ansible.builtin.debug: var=gemlist
 
 - block:
     - name: update system gem
-      gem: name={{ item }} state=latest user_install=no
+      ansible.builtin.gem: name={{ item }} state=latest user_install=no
       with_items: "{{ gemlist.stdout_lines }}"
       register: pkg_result
       until: pkg_result is success
     - name: set gem_updated var
-      set_fact:
+      ansible.builtin.set_fact:
         gem_updated: true
   when: >
     gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and
@@ -50,26 +50,28 @@
     gemlist.stdout_lines is defined and gemlist.stdout_lines != []
   tags: gem
 
-- debug: var=gem_user
-- debug: var=upgradepkgsgem_gem_user
+- ansible.builtin.debug:
+    var: gem_user
+- ansible.builtin.debug:
+    var: upgradepkgsgem_gem_user
 - block:
     - name: get outdated user gem
 #          shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
-      shell: "gem outdated --local | awk '!/{{ upgradepkgsgem_gem_exclude }}/ { print $1 }'"
+      ansible.builtin.shell: "gem outdated --local | awk '!/{{ upgradepkgsgem_gem_exclude }}/ { print $1 }'"
       register: gemlistuser
       changed_when: false
       ignore_errors: true
       become: yes
       become_user: "{{ upgradepkgsgem_gem_user[inventory_hostname] }}"
     - name: update user gem
-      gem: name={{ item }} state=latest
+      ansible.builtin.gem: name={{ item }} state=latest
       become: yes
       become_user: "{{ upgradepkgsgem_gem_user[inventory_hostname] }}"
       with_items: "{{ gemlistuser.stdout_lines }}"
       register: pkg_result
       until: pkg_result is success
     - name: set gem_updated var
-      set_fact:
+      ansible.builtin.set_fact:
         gem_updated: true
   when: >
     gem_user is defined and
