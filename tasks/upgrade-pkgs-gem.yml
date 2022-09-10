@@ -14,7 +14,7 @@
     - 'update: --no-rdoc --no-ri'
 
 ## possible dependencies: libsqlite3-dev
-- name: check which gem
+- name: Check which gem
   ansible.builtin.command: which gem
   changed_when: false
   ignore_errors: true
@@ -26,7 +26,7 @@
   tags: gem
   register: pkg_result
   until: pkg_result is success
-- name: get installed gem
+- name: Get installed gem
   # ansible.builtin.shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
   ansible.builtin.shell: "gem outdated --local | awk '!/{{ upgradepkgsgem_gem_exclude }}/ { print $1 }'"
   register: gemlist
@@ -37,8 +37,9 @@
 - name: Debug | gem list
   ansible.builtin.debug: var=gemlist
 
-- block:
-    - name: update system gem
+- name: System gem
+  block:
+    - name: Update system gem
       ansible.builtin.gem:  # noqa package-latest
         name: "{{ item }}"
         state: latest
@@ -46,7 +47,7 @@
       with_items: "{{ gemlist.stdout_lines }}"
       register: pkg_result
       until: pkg_result is success
-    - name: set gem_updated var
+    - name: Set gem_updated var
       ansible.builtin.set_fact:
         gem_updated: true
   when: >
@@ -61,8 +62,9 @@
 - name: Debug | upgradepkgsgem_gem_user
   ansible.builtin.debug:
     var: upgradepkgsgem_gem_user
-- block:
-    - name: get outdated user gem
+- name: User gem
+  block:
+    - name: Get outdated user gem
       # shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
       ansible.builtin.shell: "gem outdated --local | awk '!/{{ upgradepkgsgem_gem_exclude }}/ { print $1 }'"
       register: gemlistuser
@@ -70,7 +72,7 @@
       ignore_errors: true
       become: yes
       become_user: "{{ upgradepkgsgem_gem_user[inventory_hostname] }}"
-    - name: update user gem
+    - name: Update user gem
       ansible.builtin.gem:  # noqa package-latest
         name: "{{ item }}"
         state: latest
@@ -79,7 +81,7 @@
       with_items: "{{ gemlistuser.stdout_lines }}"
       register: pkg_result
       until: pkg_result is success
-    - name: set gem_updated var
+    - name: Set gem_updated var
       ansible.builtin.set_fact:
         gem_updated: true
   when: >
