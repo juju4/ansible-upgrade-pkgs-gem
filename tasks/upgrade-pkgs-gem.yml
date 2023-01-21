@@ -49,7 +49,7 @@
   tags: gem
   block:
     - name: Update system gem
-      ansible.builtin.gem:  # noqa package-latest
+      community.general.gem:  # noqa package-latest
         name: "{{ item }}"
         state: latest
         user_install: no
@@ -82,7 +82,7 @@
       become: yes
       become_user: "{{ upgradepkgsgem_gem_user[inventory_hostname] }}"
     - name: Update user gem
-      ansible.builtin.gem:  # noqa package-latest
+      community.general.gem:  # noqa package-latest
         name: "{{ item }}"
         state: latest
       become: yes
