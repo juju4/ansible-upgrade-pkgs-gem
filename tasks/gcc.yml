@@ -1,6 +1,8 @@
 ---
 
 - name: Ensure gcc is present
-  ansible.builtin.package: name=gcc state=present
+  ansible.builtin.package:
+    name: gcc
+    state: present
   register: pkg_result
   until: pkg_result is success

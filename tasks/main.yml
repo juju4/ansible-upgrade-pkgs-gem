@@ -10,5 +10,6 @@
 #   include_vars: "Alpine.yml"
 #   when: ansible_os_family == "Alpine"
 
-- include: upgrade-pkgs-gem.yml
+- name: Include upgrade-pkgs-gem
+  ansible.builtin.include_tasks: upgrade-pkgs-gem.yml
 #  when: not (upgradepkgsgem_exclude_hosts is defined and upgradepkgsgem_exclude_hosts[inventory_hostname])

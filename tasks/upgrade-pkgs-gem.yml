@@ -1,6 +1,7 @@
 ---
 
-- include: gcc.yml
+- name: Include gcc
+  ansible.builtin.include_tasks: gcc.yml
   when: ansible_system == 'Linux'
 
 - name: Ensure gem without documentation - can fill inodes
@@ -21,7 +22,9 @@
   register: gem1
   tags: gem
 - name: Linux | ensure ruby-dev is installed
-  ansible.builtin.package: name=ruby-dev state=present
+  ansible.builtin.package:
+    name: ruby-dev
+    state: present
   when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and ansible_system == "Linux"
   tags: gem
   register: pkg_result
@@ -35,9 +38,15 @@
   when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1
   tags: gem
 - name: Debug | gem list
-  ansible.builtin.debug: var=gemlist
+  ansible.builtin.debug:
+    var: gemlist
 
 - name: System gem
+  when: >
+    gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and
+    gemlist.stdout is defined and gemlist.stdout and
+    gemlist.stdout_lines is defined and gemlist.stdout_lines != []
+  tags: gem
   block:
     - name: Update system gem
       ansible.builtin.gem:  # noqa package-latest
@@ -50,11 +59,6 @@
     - name: Set gem_updated var
       ansible.builtin.set_fact:
         gem_updated: true
-  when: >
-    gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and
-    gemlist.stdout is defined and gemlist.stdout and
-    gemlist.stdout_lines is defined and gemlist.stdout_lines != []
-  tags: gem
 
 - name: Debug | gem user
   ansible.builtin.debug:
@@ -63,6 +67,11 @@
   ansible.builtin.debug:
     var: upgradepkgsgem_gem_user
 - name: User gem
+  when: >
+    gem_user is defined and
+    upgradepkgsgem_gem_user[inventory_hostname] is defined and
+    upgradepkgsgem_gem_user[inventory_hostname]
+  tags: gem
   block:
     - name: Get outdated user gem
       # shell: "gem list --local --no-versions |egrep -v '(LOCAL GEMS|^$)'"
@@ -84,11 +93,6 @@
     - name: Set gem_updated var
       ansible.builtin.set_fact:
         gem_updated: true
-  when: >
-    gem_user is defined and
-    upgradepkgsgem_gem_user[inventory_hostname] is defined and
-    upgradepkgsgem_gem_user[inventory_hostname]
-  tags: gem
 
 ## gem cleanup <pkg>
 ## gem uninstall -i /usr/share/rubygems-integration/all thor
