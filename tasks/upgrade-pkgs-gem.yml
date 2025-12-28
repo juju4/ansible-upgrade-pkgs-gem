@@ -2,7 +2,7 @@
 
 - name: Include gcc
   ansible.builtin.include_tasks: gcc.yml
-  when: ansible_system == 'Linux'
+  when: ansible_facts['system'] == 'Linux'
 
 - name: Ensure gem without documentation - can fill inodes
   ansible.builtin.lineinfile:
@@ -25,7 +25,7 @@
   ansible.builtin.package:
     name: ruby-dev
     state: present
-  when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and ansible_system == "Linux"
+  when: gem1 is defined and gem1.stdout is defined and gem1.stdout.find("/usr") != -1 and ansible_facts['system'] == "Linux"
   tags: gem
   register: pkg_result
   until: pkg_result is success

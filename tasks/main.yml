@@ -1,14 +1,14 @@
 ---
 
 # - name: Include version-specific variables for Ubuntu.
-#   include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
-#   when: ansible_distribution == 'Ubuntu'
+#   include_vars: "{{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}.yml"
+#   when: ansible_facts['distribution'] == 'Ubuntu'
 # - name: Include version-specific variables for RedHat
-#   include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
-#   when: ansible_os_family == "RedHat"
+#   include_vars: "RedHat-{{ ansible_facts['distribution_major_version'] }}.yml"
+#   when: ansible_facts['os_family'] == "RedHat"
 # - name: Include version-specific variables for Alpine
 #   include_vars: "Alpine.yml"
-#   when: ansible_os_family == "Alpine"
+#   when: ansible_facts['os_family'] == "Alpine"
 
 - name: Include upgrade-pkgs-gem
   ansible.builtin.include_tasks: upgrade-pkgs-gem.yml
